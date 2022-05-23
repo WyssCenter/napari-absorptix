@@ -1,0 +1,7 @@
+numpy
+napari[all]
+scipy
+matplotlib
+napari_tools_menu
+magic-class
+napari-plugin-engine>=0.1.4
