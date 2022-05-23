@@ -13,8 +13,11 @@ def func(x, a, b):
     return a * x + b
 
 
-@magic_factory(call_button='Compute absorption auto')
-def compute_absorption_auto(image: Image, rectangle: Shapes) -> None:
+@magic_factory(call_button='Compute absorption auto',
+               transverse_resolution={'tooltip': 'Transverse resolution in micrometers.'})
+def compute_absorption_auto(image: Image,
+                            rectangle: Shapes,
+                            transverse_resolution: float=5.26) -> None:
     fig, ax = plt.subplots()
     depth = int(image.position[0])
     a, b = butter(4, 0.1, btype='low')
@@ -31,17 +34,22 @@ def compute_absorption_auto(image: Image, rectangle: Shapes) -> None:
         l1 = filtfilt(a, b, l)
         ind_max = np.argmax(l1)
         l1 = l1[:ind_max]
-        x = np.arange(l1.size)
+        x = np.arange(l1.size)*transverse_resolution
         popt, _ = curve_fit(func, x, l1)
-        ax.plot(l, ':')
-        ax.plot(l1)
+        ax.plot(np.arange(l.size)*transverse_resolution, l, ':')
+        ax.plot(x, l1)
         ax.plot(x, func(x, *popt), label='a={:.2f}'.format(popt[0]*1000))
+        ax.set_xlabel('Distance [$\mu m$]')
+        ax.set_ylabel('Intensity (log) [a.u.]')
 
     plt.legend()
     plt.show()
 
-@magic_factory(call_button='Compute absorption manual')
-def compute_absorption_manual(image: Image, rectangle: Shapes) -> None:
+@magic_factory(call_button='Compute absorption manual',
+               transverse_resolution={'tooltip': 'Transverse resolution in micrometers.'})
+def compute_absorption_manual(image: Image,
+                              rectangle: Shapes,
+                              transverse_resolution: float=5.26) -> None:
 
     if len(rectangle.data) != 1:
         raise ValueError('Error: this function can only be used with 1 rectangle, got {}.'.format(len(rectangle.data)))
@@ -60,27 +68,33 @@ def compute_absorption_manual(image: Image, rectangle: Shapes) -> None:
     crop = image.data[depth, y1:y2, x1:x2]
 
     l = np.log(np.mean(crop, axis=0))
+    plt.xlabel('Distance [$\mu m$]')
+    plt.ylabel('Intensity (log) [a.u.]')
+    plt.title('CLICK FOR FIT')
 
-    plt.plot(l)
+    plt.plot(np.arange(l.size)*transverse_resolution, l)
     pts = plt.ginput(n=-1, timeout=-1)
     plt.close()
     pts = np.array(pts)
 
-    print(pts)
-
     if pts.shape[0] % 2 != 0:
         raise ValueError('The number of points should be even.')
 
-    xs = pts[:, 0].astype(int)
+    xs = (pts[:, 0]/transverse_resolution).astype(int)
+    xs[xs < 0] = 0
     fig, ax = plt.subplots()
-    ax.plot(l)
+    ax.plot(np.arange(l.size)*transverse_resolution, l)
     for i in range(int(pts.shape[0]/2)):
         x1 = xs[2*i]
         x2 = xs[2*i + 1]
 
         x = np.arange(x1, x2)
+
         popt, _ = curve_fit(func, x, l[x1:x2])
-        ax.plot(x, func(x, *popt), label='a={:.2f}'.format(popt[0]*1000))
+        ax.plot(x*transverse_resolution, func(x, *popt), label='a={:.2f}'.format(popt[0]*1000))
+
+    ax.set_xlabel('Distance [$\mu m$]')
+    ax.set_ylabel('Intensity (log) [a.u.]')
 
     plt.legend()
     plt.show()
