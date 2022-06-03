@@ -2,10 +2,8 @@ import os.path
 import numpy as np
 from typing import List, Any, Optional, Union, Tuple, Dict
 from napari.types import ReaderFunction
-from napari_plugin_engine import napari_hook_implementation
 from napari.layers import Shapes
 
-@napari_hook_implementation
 def napari_get_reader(path: Union[str, List[str]]) -> Optional[ReaderFunction]:
     """
     Return a function capable of reading raw files lazily into napari layer data.
@@ -21,15 +19,10 @@ def napari_get_reader(path: Union[str, List[str]]) -> Optional[ReaderFunction]:
         same path or list of paths, and returns a list of layer data tuples.
         Otherwise returns ``None``.
     """
-    if isinstance(path, list):
-        for p in path:
-            if not isinstance(p, str) or p.endswith('.raw'):
-                return None
-    elif isinstance(path, str):
-        if not path.endswith('.raw'):
-            return None
 
-    return raw_reader
+    if isinstance(path, str):
+        if path.endswith('.raw'):
+            return raw_reader
 
 
 def raw_reader(path: Union[str, List[str]]) -> List[Tuple[Any, Dict, str]]:
@@ -44,7 +37,7 @@ def raw_reader(path: Union[str, List[str]]) -> List[Tuple[Any, Dict, str]]:
 
     Returns
     -------
-    layer_data : list of tuples
+     : list of tuples
         A list of LayerData tuples where each tuple in the list contains
         (data, metadata, layer_type), where data is a lazy_raw, metadata is
         a dict of keyword arguments for the corresponding viewer.add_* method

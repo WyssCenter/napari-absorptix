@@ -5,19 +5,31 @@ contributions:
   - id: napari-absorptix.compute_absorption_auto
     title: Create compute_absorption_auto
     python_name: napari_absorptix._absorption:compute_absorption_auto
+
   - id: napari-absorptix.compute_absorption_manual
     title: Create compute_absorption_manual
     python_name: napari_absorptix._absorption:compute_absorption_manual
+
+  - id: napari-absorptix.plot_profile
+    title: Create plot_profile
+    python_name: napari_absorptix._absorption:plot_profile
+
   - id: napari-absorptix.get_reader
     title: Get Reader
     python_name: napari_absorptix._reader:napari_get_reader
+
   readers:
   - command: napari-absorptix.get_reader
     filename_patterns:
     - '*.raw'
     accepts_directories: true
+
   widgets:
   - command: napari-absorptix.compute_absorption_auto
-    display_name: compute_absorption_auto
+    display_name: Compute absorption automatically
+
   - command: napari-absorptix.compute_absorption_manual
-    display_name: compute_absorption_manual
+    display_name: Compute absorption interactively
+
+  - command: napari-absorptix.plot_profile
+    display_name: Plot profile
