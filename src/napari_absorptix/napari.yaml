@@ -14,6 +14,10 @@ contributions:
     title: Create plot_profile
     python_name: napari_absorptix._absorption:plot_profile
 
+  - id: napari-absorptix.plot_aligned_profile
+    title: Create plot_aligned_profile
+    python_name: napari_absorptix._absorption:plot_aligned_profile
+
   - id: napari-absorptix.get_reader
     title: Get Reader
     python_name: napari_absorptix._reader:napari_get_reader
@@ -32,4 +36,7 @@ contributions:
     display_name: Compute absorption interactively
 
   - command: napari-absorptix.plot_profile
-    display_name: Plot profile
+    display_name: Plot all layer profile
+
+  - command: napari-absorptix.plot_aligned_profile
+    display_name: Plot aligned profile

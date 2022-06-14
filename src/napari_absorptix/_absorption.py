@@ -136,7 +136,7 @@ def compute_absorption_manual(image: Image,
     plt.legend()
     plt.show()
 
-@magic_factory(call_button='Plot profile',
+@magic_factory(call_button='Plot all layers profile',
                transverse_resolution={'tooltip': 'Transverse resolution in micrometers.'},
                normalize={                         'tooltip': 'normalize by the maximum of each profile'})
 def plot_profile(viewer: Viewer,
@@ -166,4 +166,38 @@ def plot_profile(viewer: Viewer,
         plt.xlabel('Distance [$\mu m$]')
         plt.ylabel('Intensity (log) [a.u.]')
         plt.legend()
+        plt.show()
+
+@magic_factory(call_button='Plot aligned profile',
+               transverse_resolution={'tooltip': 'Transverse resolution in micrometers.'},
+               normalize={                         'tooltip': 'normalize by the maximum of each profile'})
+def plot_aligned_profile(image: Image,
+                 rectangle: Shapes,
+                 transverse_resolution: float=5.26,
+                 normalize: bool=False) -> None:
+
+    depth = int(image.position[0])
+
+    for data in rectangle.data:
+        if data.shape[1] == 3:
+            data = data[0][:, 1:]
+
+        y1 = int(np.min(data[:, 0]))
+        x1 = int(np.min(data[:, 1]))
+        y2 = int(np.max(data[:, 0]))
+        x2 = int(np.max(data[:, 1]))
+
+        crop = image.data[depth, y1:y2, x1:x2]
+        l = np.log(np.mean(crop, axis=0))
+        ind_max = np.argmax(np.diff(l))
+        if normalize:
+            l = l/l.max()
+
+        plt.figure(1)
+        plt.plot(np.arange(-ind_max, l.size - ind_max)*transverse_resolution, l, label=image.name)
+
+        plt.xlabel('Distance [$\mu m$]')
+        plt.ylabel('Intensity (log) [a.u.]')
+        plt.legend()
+        plt.draw()
         plt.show()
