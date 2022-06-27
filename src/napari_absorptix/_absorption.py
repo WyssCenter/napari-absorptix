@@ -177,7 +177,7 @@ def plot_aligned_profile(image: Image,
                  normalize: bool=False) -> None:
 
     depth = int(image.position[0])
-
+    b, a = butter(3, 0.025, 'lowpass')
     for data in rectangle.data:
         if data.shape[1] == 3:
             data = data[0][:, 1:]
@@ -189,7 +189,7 @@ def plot_aligned_profile(image: Image,
 
         crop = image.data[depth, y1:y2, x1:x2]
         l = np.log(np.mean(crop, axis=0))
-        ind_max = np.argmax(np.diff(l))
+        ind_max = np.argmax(np.abs(np.diff(filtfilt(b, a, l))))
         if normalize:
             l = l/l.max()
 
